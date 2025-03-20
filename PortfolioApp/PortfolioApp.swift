@@ -15,6 +15,7 @@ struct PortfolioApp: App {
         WindowGroup {
             NavigationSplitView {
                 SidebarView()
+                    .environment(DataController.preview)
             } content: {
                 ContentView()
             } detail: {

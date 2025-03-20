@@ -7,9 +7,11 @@
 
 import CoreData
 
-@Observable
-class DataController {
+
+@Observable class DataController {
     let container: NSPersistentCloudKitContainer
+    
+    var selectedFilter: Filter? = Filter.all
     
     static var preview: DataController = {
         let dataController = DataController(inMemory: true)
