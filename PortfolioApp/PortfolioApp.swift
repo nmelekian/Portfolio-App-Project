@@ -15,13 +15,17 @@ struct PortfolioApp: App {
         WindowGroup {
             NavigationSplitView {
                 SidebarView()
-                    .environment(DataController.preview)
+                    
             } content: {
                 ContentView()
+                    
             } detail: {
                 DetailView()
+                    
             }
-                .environment(\.managedObjectContext, dataController.container.viewContext)
+            .environment(dataController)
+            .environment(\.managedObjectContext, dataController.container.viewContext)
+
         }
     }
 }

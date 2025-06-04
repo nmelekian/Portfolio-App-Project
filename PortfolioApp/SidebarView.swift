@@ -36,19 +36,29 @@ struct SidebarView: View {
                             .badge(filter.tag?.tagUnwatchedMovies.count ?? 0)
                     }
                 }
+                .onDelete(perform: delete)
             }
         }
         .toolbar {
             Button {
                 dataController.deleteAll()
                 dataController.createSampleData()
+                
             } label: {
                 Label("Add samples", systemImage: "flame")
             }
+        }
+    }
+    
+    func delete(_ offsets: IndexSet) {
+        for offset in offsets {
+            let item = tags[offset]
+            dataController.delete(item)
         }
     }
 }
 
 #Preview {
     SidebarView()
+
 }
