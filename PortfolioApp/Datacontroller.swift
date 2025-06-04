@@ -49,7 +49,7 @@ import CoreData
                 movie.content = "Description"
                 movie.creationDate = .now
                 movie.watched = Bool.random()
-                movie.priority = Int16.random(in: 0...2)
+                movie.watchPriority = Int16.random(in: 0...2)
                 tag.addToMovies(movie)
             }
         }
