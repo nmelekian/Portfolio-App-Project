@@ -8,10 +8,10 @@
 import CoreData
 
 
-@Observable class DataController {
+class DataController: ObservableObject {
     let container: NSPersistentCloudKitContainer
     
-    var selectedFilter: Filter? = Filter.all
+   @Published var selectedFilter: Filter? = Filter.all
     
     static var preview: DataController = {
         let dataController = DataController(inMemory: true)
@@ -30,7 +30,10 @@ import CoreData
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         container.persistentStoreDescriptions.first?.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
-//        NotificationCenter.default.addObserver(forName: .NSPersistentStoreRemoteChange, object: container.persistentStoreCoordinator, queue: .main, using: remoteStoreChanged)
+        NotificationCenter.default.addObserver(forName: .NSPersistentStoreRemoteChange, object: container.persistentStoreCoordinator, queue: .main) { (note) in
+            
+            
+        }
         
         container.loadPersistentStores { storeDescription, error in
             if let error {
@@ -39,9 +42,9 @@ import CoreData
         }
     }
     
-//    func remoteStoreChanged(_ notification: Notification) {
-//        objectWillChange.send()
-//    }
+    func remoteStoreChanged(_ notification: Notification) {
+        objectWillChange.send()
+    }
     
     func createSampleData() {
         let viewContext = container.viewContext

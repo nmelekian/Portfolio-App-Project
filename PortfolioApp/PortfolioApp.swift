@@ -23,7 +23,7 @@ struct PortfolioApp: App {
                 DetailView()
                     
             }
-            .environment(dataController)
+            .environmentObject(dataController)
             .environment(\.managedObjectContext, dataController.container.viewContext)
 
         }

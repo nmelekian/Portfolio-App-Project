@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @Environment(DataController.self) private var dataController: DataController
+    @EnvironmentObject var dataController: DataController
     
     var movies: [Movie] {
         let filter = dataController.selectedFilter ?? .all
@@ -26,7 +26,7 @@ struct ContentView: View {
     }
     
     var body: some View {
-        @Bindable var dataController = dataController
+//        @Bindable var dataController = dataController
         
         List {
             ForEach(movies) { movie in

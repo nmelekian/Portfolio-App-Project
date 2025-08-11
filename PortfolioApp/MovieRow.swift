@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MovieRow: View {
-    @Environment(DataController.self) private var dataController: DataController
+    @EnvironmentObject var dataController: DataController
     @ObservedObject var movie: Movie
     
     

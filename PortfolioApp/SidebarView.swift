@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SidebarView: View {
-    @Environment(DataController.self) private var dataController: DataController
+    @EnvironmentObject var dataController: DataController
     let smartFilters: [Filter] = [.all, .recent]
     @FetchRequest(sortDescriptors: [SortDescriptor(\.name)]) var tags: FetchedResults<Tag>
     var tagFilters: [Filter] {
@@ -18,8 +18,7 @@ struct SidebarView: View {
     }
     
     var body: some View {
-        @Bindable var dataController = dataController
-        
+   
         List(selection: $dataController.selectedFilter) {
             Section("Smart Filters") {
                 ForEach(smartFilters) { filter in
