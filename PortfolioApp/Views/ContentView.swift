@@ -28,7 +28,7 @@ struct ContentView: View {
     var body: some View {
 //        @Bindable var dataController = dataController
         
-        List {
+        List(selection: $dataController.selectedMovie) {
             ForEach(movies) { movie in
                 MovieRow(movie: movie)
             }

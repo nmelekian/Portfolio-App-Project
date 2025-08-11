@@ -11,7 +11,8 @@ import CoreData
 class DataController: ObservableObject {
     let container: NSPersistentCloudKitContainer
     
-   @Published var selectedFilter: Filter? = Filter.all
+    @Published var selectedFilter: Filter? = Filter.all
+    @Published var selectedMovie: Movie?
     
     static var preview: DataController = {
         let dataController = DataController(inMemory: true)
@@ -30,10 +31,7 @@ class DataController: ObservableObject {
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         container.persistentStoreDescriptions.first?.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
-        NotificationCenter.default.addObserver(forName: .NSPersistentStoreRemoteChange, object: container.persistentStoreCoordinator, queue: .main) { (note) in
-            
-            
-        }
+        NotificationCenter.default.addObserver(forName: .NSPersistentStoreRemoteChange, object: container.persistentStoreCoordinator, queue: .main, using: remoteStoreChanged)
         
         container.loadPersistentStores { storeDescription, error in
             if let error {
@@ -100,5 +98,16 @@ class DataController: ObservableObject {
         delete(request2)
         
         save()
+    }
+    
+    func missingTags(from movie: Movie) -> [Tag] {
+        let request = Tag.fetchRequest()
+        let allTags = (try? container.viewContext.fetch(request)) ?? []
+        
+        let allTagsSet = Set(allTags)
+        let difference = allTagsSet.symmetricDifference(movie.movieTags)
+        
+        return difference.sorted()
+        
     }
 }

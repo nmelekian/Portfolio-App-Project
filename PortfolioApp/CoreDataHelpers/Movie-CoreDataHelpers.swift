@@ -30,6 +30,24 @@ extension Movie {
         let result = tags?.allObjects as? [Tag] ?? []
         return result.sorted()
     }
+    
+    var movieStatus: String {
+        if watched {
+            return "Watched"
+        } else {
+            return "Unwatched"
+        }
+    }
+    
+    var movieTagsList: String {
+        guard let tags else {return "No Tags"}
+        
+        if tags.count == 0 {
+            return "No Tags"
+        } else {
+            return movieTags.map(\.tagName).formatted()
+        }
+    }
     static var example: Movie {
         let controller = DataController(inMemory: true)
         let viewContext = controller.container.viewContext
