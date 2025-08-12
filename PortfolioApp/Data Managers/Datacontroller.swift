@@ -14,6 +14,10 @@ class DataController: ObservableObject {
     @Published var selectedFilter: Filter? = Filter.all
     @Published var selectedMovie: Movie?
     
+    
+    private var saveTask: Task<Void, Error>?
+    
+    
     static var preview: DataController = {
         let dataController = DataController(inMemory: true)
         dataController.createSampleData()
@@ -72,6 +76,15 @@ class DataController: ObservableObject {
         }
     }
     
+    func queueSave() {
+        saveTask?.cancel()
+        
+        saveTask = Task { @MainActor in 
+            try await Task.sleep(for: .seconds(3))
+            save()
+        }
+    }
+    
     
     func delete(_ object: NSManagedObject) {
         object.objectWillChange.send()
@@ -108,6 +121,23 @@ class DataController: ObservableObject {
         let difference = allTagsSet.symmetricDifference(movie.movieTags)
         
         return difference.sorted()
+        
+    }
+    
+    func moviesForSelectedFilter() -> [Movie] {
+        
+            let filter = dataController.selectedFilter ?? .all
+            var allMovies: [Movie]
+            
+            if let tag = filter.tag {
+                allMovies = tag.movies?.allObjects as? [Movie] ?? []
+            } else {
+                let request = Movie.fetchRequest()
+                request.predicate = NSPredicate(format: "modificationDate > %@", filter.minModificationDate as NSDate)
+                allMovies = (try? dataController.container.viewContext.fetch(request)) ?? []
+            }
+            
+            return allMovies.sorted()
         
     }
 }

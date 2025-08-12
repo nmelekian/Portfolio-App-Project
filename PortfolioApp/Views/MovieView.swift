@@ -74,6 +74,9 @@ struct MovieView: View {
             }
         }
         .disabled(movie.isDeleted)
+        .onReceive(movie.objectWillChange) { _ in
+            dataController.queueSave()
+        }
     }
 }
 

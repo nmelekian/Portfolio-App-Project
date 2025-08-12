@@ -10,26 +10,13 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var dataController: DataController
     
-    var movies: [Movie] {
-        let filter = dataController.selectedFilter ?? .all
-        var allMovies: [Movie]
-        
-        if let tag = filter.tag {
-            allMovies = tag.movies?.allObjects as? [Movie] ?? []
-        } else {
-            let request = Movie.fetchRequest()
-            request.predicate = NSPredicate(format: "modificationDate > %@", filter.minModificationDate as NSDate)
-            allMovies = (try? dataController.container.viewContext.fetch(request)) ?? []
-        }
-        
-        return allMovies.sorted()
-    }
+    
     
     var body: some View {
 //        @Bindable var dataController = dataController
         
         List(selection: $dataController.selectedMovie) {
-            ForEach(movies) { movie in
+            ForEach(dataController.moviesForSelectedFilter()) { movie in
                 MovieRow(movie: movie)
             }
             .onDelete(perform: delete)
@@ -38,6 +25,8 @@ struct ContentView: View {
     }
     
     func delete(_ offsets: IndexSet) {
+        let movies = dataController.moviesForSelectedFilter()
+        
         for offset in offsets {
             let item = movies[offset]
             dataController.delete(item)

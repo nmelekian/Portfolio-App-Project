@@ -9,6 +9,8 @@ import SwiftUI
 
 @main
 struct PortfolioApp: App {
+    @Environment(\.scenePhase) var scenePhase
+    
     @State var dataController = DataController()
     
     var body: some Scene {
@@ -24,6 +26,11 @@ struct PortfolioApp: App {
                     
             }
             .environmentObject(dataController)
+            .onChange(of: scenePhase) { _, phase in
+                if phase != .active {
+                    dataController.save()
+                }
+            }
             .environment(\.managedObjectContext, dataController.container.viewContext)
 
         }
