@@ -14,9 +14,7 @@ struct NoMovieView: View {
             .font(.title)
             .foregroundStyle(.secondary)
         
-        Button("New Movie") {
-            // make a new movie
-        }
+        Button("New Movie", action: dataController.newMovie)
     }
 }
 

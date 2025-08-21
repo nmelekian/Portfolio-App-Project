@@ -173,13 +173,13 @@ class DataController: ObservableObject {
         
         if filterEnabled {
             if filterPriority >= 0 {
-                let priorityFilter = NSPredicate(format: "priority = %d", filterPriority)
+                let priorityFilter = NSPredicate(format: "watchPriority = %d", filterPriority)
                 predicates.append(priorityFilter)
             }
             
             if filterStatus != .all {
                 let lookForWatched = filterStatus == .watched
-                let statusFilter = NSPredicate(format: "completed = %@", NSNumber(value: lookForWatched))
+                let statusFilter = NSPredicate(format: "watched = %@", NSNumber(value: lookForWatched))
                 predicates.append(statusFilter)
             }
         }
@@ -190,6 +190,27 @@ class DataController: ObservableObject {
         let allMovies = (try? container.viewContext.fetch(request)) ?? []
         return allMovies.sorted()
         
+    }
+    
+    func newMovie() {
+        let movie = Movie(context: container.viewContext)
+        movie.title = "New Movie"
+        movie.creationDate = .now
+        
+        if let tag = selectedFilter?.tag {
+            movie.addToTags(tag)
+        }
+        
+        save()
+        
+        selectedMovie = movie
+    }
+    
+    func newTag() {
+        let tag = Tag(context: container.viewContext)
+        tag.id = UUID()
+        tag.name = "New tag"
+        save()
     }
     
     

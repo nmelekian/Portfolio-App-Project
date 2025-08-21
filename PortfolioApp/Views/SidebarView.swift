@@ -17,6 +17,10 @@ struct SidebarView: View {
         }
     }
     
+    @State private var tagToRename: Tag?
+    @State private var renamingTag = false
+    @State private var tagName = ""
+    
     var body: some View {
    
         List(selection: $dataController.selectedFilter) {
@@ -33,12 +37,20 @@ struct SidebarView: View {
                     NavigationLink(value: filter) {
                         Label(filter.name, systemImage: filter.icon)
                             .badge(filter.tag?.tagUnwatchedMovies.count ?? 0)
+                            .contextMenu {
+                                Button {
+                                    rename(filter)
+                                } label: {
+                                    Label("Rename", systemImage: "pencil")
+                                }
+                            }
                     }
                 }
                 .onDelete(perform: delete)
             }
         }
         .toolbar {
+            #if DEBUG
             Button {
                 dataController.deleteAll()
                 dataController.createSampleData()
@@ -46,6 +58,16 @@ struct SidebarView: View {
             } label: {
                 Label("Add samples", systemImage: "flame")
             }
+            #endif
+            
+            Button(action: dataController.newTag) {
+                Label("Add tag", systemImage: "plus")
+            }
+        }
+        .alert("Rename tag", isPresented: $renamingTag) {
+            Button("OK", action: completeRename)
+            Button("Cancel", role: .cancel)
+            TextField("New name", text: $tagName)
         }
     }
     
@@ -54,6 +76,17 @@ struct SidebarView: View {
             let item = tags[offset]
             dataController.delete(item)
         }
+    }
+    
+    func rename(_ filter: Filter) {
+        tagToRename = filter.tag
+        tagName = filter.name
+        renamingTag = true
+    }
+    
+    func completeRename() {
+        tagToRename?.name = tagName
+        dataController.save()
     }
 }
 

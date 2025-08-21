@@ -68,6 +68,10 @@ struct ContentView: View {
                 Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
                     .symbolVariant(dataController.filterEnabled ? .fill : .none)
             }
+            
+            Button(action: dataController.newMovie) {
+                Label("New Movie", systemImage: "square.and.pencil")
+            }
         }
     }
     
