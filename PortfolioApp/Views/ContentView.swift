@@ -13,7 +13,7 @@ struct ContentView: View {
     
     
     var body: some View {
-//        @Bindable var dataController = dataController
+        //        @Bindable var dataController = dataController
         
         List(selection: $dataController.selectedMovie) {
             ForEach(dataController.moviesForSelectedFilter()) { movie in
@@ -22,6 +22,10 @@ struct ContentView: View {
             .onDelete(perform: delete)
         }
         .navigationTitle("Movies")
+        .searchable(text: $dataController.filterText, tokens: $dataController.filterTokens,
+                    suggestedTokens: .constant(dataController.suggestedFilterTokens), prompt: "Filter movies, or type # to add tags") { tag in
+            Text(tag.tagName)
+        }
     }
     
     func delete(_ offsets: IndexSet) {

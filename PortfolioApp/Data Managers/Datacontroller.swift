@@ -13,10 +13,25 @@ class DataController: ObservableObject {
     
     @Published var selectedFilter: Filter? = Filter.all
     @Published var selectedMovie: Movie?
-    
+    @Published var filterText = ""
+    @Published var filterTokens = [Tag]()
     
     private var saveTask: Task<Void, Error>?
     
+    var suggestedFilterTokens: [Tag] {
+        guard filterText.starts(with: "#") else {
+            return []
+        }
+        
+        let trimmedFilterText = String(filterText.dropFirst()).trimmingCharacters(in: .whitespaces)
+        let request = Tag.fetchRequest()
+        
+        if trimmedFilterText.isEmpty == false {
+            request.predicate = NSPredicate(format: "name CONTAINS[c] %@", trimmedFilterText)
+        }
+        
+        return (try? container.viewContext.fetch(request).sorted()) ?? []
+    }
     
     static var preview: DataController = {
         let dataController = DataController(inMemory: true)
@@ -79,7 +94,7 @@ class DataController: ObservableObject {
     func queueSave() {
         saveTask?.cancel()
         
-        saveTask = Task { @MainActor in 
+        saveTask = Task { @MainActor in
             try await Task.sleep(for: .seconds(3))
             save()
         }
@@ -126,18 +141,36 @@ class DataController: ObservableObject {
     
     func moviesForSelectedFilter() -> [Movie] {
         
-            let filter = dataController.selectedFilter ?? .all
-            var allMovies: [Movie]
-            
-            if let tag = filter.tag {
-                allMovies = tag.movies?.allObjects as? [Movie] ?? []
-            } else {
-                let request = Movie.fetchRequest()
-                request.predicate = NSPredicate(format: "modificationDate > %@", filter.minModificationDate as NSDate)
-                allMovies = (try? dataController.container.viewContext.fetch(request)) ?? []
-            }
-            
-            return allMovies.sorted()
+        let filter = selectedFilter ?? .all
+        var predicates = [NSPredicate]()
+        
+        if let tag = filter.tag {
+            let tagPredicate = NSPredicate(format: "tags CONTAINS %@", tag)
+            predicates.append(tagPredicate)
+        } else {
+            let datePredicate = NSPredicate(format: "modificationDate > %@", filter.minModificationDate as NSDate)
+            predicates.append(datePredicate)
+        }
+        
+        let trimmedFilterText = filterText.trimmingCharacters(in: .whitespaces)
+        
+        if trimmedFilterText.isEmpty == false {
+            let titlePredicate = NSPredicate(format: "title CONTAINS[c] %@", trimmedFilterText)
+            let contentPredicate = NSPredicate(format: "content CONTAINS[c] %@", trimmedFilterText)
+            let combinedPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: [titlePredicate, contentPredicate])
+            predicates.append(combinedPredicate)
+        }
+        
+        if filterTokens.isEmpty == false {
+            let tokenPredicate = NSPredicate(format: "ANY tags IN %@", filterTokens)
+            predicates.append(tokenPredicate)
+        }
+        
+        let request = Movie.fetchRequest()
+        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        
+        let allMovies = (try? container.viewContext.fetch(request)) ?? []
+        return allMovies.sorted()
         
     }
 }
