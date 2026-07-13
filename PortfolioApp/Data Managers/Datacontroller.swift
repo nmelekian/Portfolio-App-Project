@@ -213,6 +213,37 @@ class DataController: ObservableObject {
         save()
     }
     
+    func count<T>(for fetchRequest: NSFetchRequest<T>) -> Int {
+        (try? container.viewContext.count(for: fetchRequest)) ?? 0
+    }
+    
+    func hasEarned(award: Award) -> Bool {
+        switch award.criterion {
+        case "issues":
+            let fetchRequest = Movie.fetchRequest()
+            let awardCount = count(for: fetchRequest)
+            return awardCount >= award.value
+            
+        case "closed":
+            let fetchRequest = Movie.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "watched = true")
+            let awardCount = count(for: fetchRequest)
+            return awardCount >= award.value
+            
+        case "tags":
+                // return true if they created a certain number of tags
+                let fetchRequest = Tag.fetchRequest()
+                let awardCount = count(for: fetchRequest)
+                return awardCount >= award.value
+            
+        default:
+            
+//            fatalError("Unknown award criterion: \(award.criterion)")
+            return false
+            
+        }
+    }
+    
     
     
 }
