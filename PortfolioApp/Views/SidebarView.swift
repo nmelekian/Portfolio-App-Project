@@ -23,7 +23,7 @@ struct SidebarView: View {
     @State private var showingAwards = false
     
     var body: some View {
-   
+        
         List(selection: $dataController.selectedFilter) {
             Section("Smart Filters") {
                 ForEach(smartFilters) { filter in
@@ -44,6 +44,12 @@ struct SidebarView: View {
                                 } label: {
                                     Label("Rename", systemImage: "pencil")
                                 }
+                                
+                                Button(role: .destructive) {
+                                    delete(filter)
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
                             }
                     }
                 }
@@ -51,7 +57,7 @@ struct SidebarView: View {
             }
         }
         .toolbar {
-            #if DEBUG
+#if DEBUG
             Button {
                 dataController.deleteAll()
                 dataController.createSampleData()
@@ -59,7 +65,7 @@ struct SidebarView: View {
             } label: {
                 Label("Add samples", systemImage: "flame")
             }
-            #endif
+#endif
             
             Button(action: dataController.newTag) {
                 Label("Add tag", systemImage: "plus")
@@ -77,6 +83,7 @@ struct SidebarView: View {
             Button("Cancel", role: .cancel) {}
             TextField("New name", text: $tagName)
         }
+        .navigationTitle("Filters")
     }
     
     func delete(_ offsets: IndexSet) {
@@ -96,6 +103,13 @@ struct SidebarView: View {
         tagToRename?.name = tagName
         dataController.save()
     }
+    
+    func delete(_ filter: Filter) {
+        guard let tag = filter.tag else { return }
+        dataController.delete(tag)
+        dataController.save()
+    }
+    
 }
 
 #Preview {
