@@ -77,6 +77,25 @@ struct MovieView: View {
         .onReceive(movie.objectWillChange) { _ in
             dataController.queueSave()
         }
+        .onSubmit(dataController.save)
+        .toolbar {
+            Menu {
+                Button {
+                    UIPasteboard.general.string = movie.title
+                } label: {
+                    Label("Copy Movie Title", systemImage: "doc.on.doc")
+                }
+                
+                Button {
+                    movie.watched.toggle()
+                    dataController.save()
+                } label: {
+                    Label(movie.watched ? "Re-watch Movie" : "Watched Movie", systemImage: "bubble.left.and.exclamationmark.bubble.right")
+                }
+            } label: {
+                Label("Actions", systemImage: "ellipsis.circle")
+            }
+        }
     }
 }
 
