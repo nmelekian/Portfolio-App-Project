@@ -20,6 +20,7 @@ struct SidebarView: View {
     @State private var tagToRename: Tag?
     @State private var renamingTag = false
     @State private var tagName = ""
+    @State private var showingAwards = false
     
     var body: some View {
    
@@ -63,10 +64,17 @@ struct SidebarView: View {
             Button(action: dataController.newTag) {
                 Label("Add tag", systemImage: "plus")
             }
+            
+            Button{
+                showingAwards.toggle()
+            } label: {
+                Label("Show Awards", systemImage: "rosette")
+            }
+            .sheet(isPresented: $showingAwards, content: AwardsView.init)
         }
         .alert("Rename tag", isPresented: $renamingTag) {
             Button("OK", action: completeRename)
-            Button("Cancel", role: .cancel)
+            Button("Cancel", role: .cancel) {}
             TextField("New name", text: $tagName)
         }
     }
